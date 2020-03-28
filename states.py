@@ -13,6 +13,8 @@ data_to_plot = ['Confirmed', 'Deaths']
 country = 'US'
 dpi = 150
 figsize = (1200 / dpi, 675 / dpi)
+date_start = np.datetime64('2020-03-01')  # None for min
+date_final = np.datetime64('2020-04-01')  # None for max
 
 # Get dataframe for all data files
 df_all = data_grabber.get_covid_df()
@@ -57,13 +59,18 @@ for y_str, ax in zip(data_to_plot, axs):
     for ci, c in enumerate(df.iloc[0:top_n_regions].index.values):
         y = df.iloc[ci, :][y_str]
         ax.plot_date(date, y / y_scale, '.-', label=c)
-    ax.xaxis.set_tick_params(rotation=75, labelsize=10)
+    ax.xaxis.set_tick_params(labelsize=10)
     if y_scale == 1:
         ax.set_yscale('log')
         ax.set_ylabel(y_str)
     else:
         ax.set_ylabel('{} [x{}]'.format(y_str, int(y_scale)))
+    dst = date[0] if date_start is None else date_start
+    den = ax.get_xlim()[1] if date_final is None else date_final
+    ax.set_xlim((dst, den))
+    formatter = mdates.ConciseDateFormatter('%b')
     ax.xaxis.set_major_locator(months)
+    ax.xaxis.set_major_formatter(formatter)
     ax.xaxis.set_minor_locator(days)
     ax.grid()
 now = datetime.utcnow()
