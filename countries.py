@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
 import data_grabber
+from datetime import datetime
 
 # Data location and variables
 sort_var = 'Confirmed'
@@ -44,7 +45,7 @@ df = pd.DataFrame(data_dict).T
 df.sort_values('{}_Total'.format(sort_var), axis=0, ascending=False, inplace=True)
 
 # Plot timeline data for each category
-fig, axs = plt.subplots(len(data_to_plot), 1, figsize=(11, 8.5), dpi=150)
+fig, axs = plt.subplots(len(data_to_plot), 1, figsize=(11, 8.5), dpi=150, sharex=True)
 months = mdates.MonthLocator()
 days = mdates.DayLocator()
 for y_str, ax in zip(data_to_plot, axs):
@@ -61,7 +62,8 @@ for y_str, ax in zip(data_to_plot, axs):
     ax.xaxis.set_minor_locator(days)
     ax.grid()
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-axs[0].set_title('Generated on {}'.format(np.datetime_as_string(date[-1], unit='D')))
+now = datetime.utcnow()
+axs[0].set_title('Generated on {}'.format(now.strftime('%b %d %Y %H:%M:%S UTC')))
 if y_scale == 1:
     fig.savefig('fig/countries_log.png')
 else:

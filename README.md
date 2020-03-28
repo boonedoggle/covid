@@ -24,8 +24,6 @@ python countries.py
 
 ![](fig/countries_lin.png)
 
-![](fig/countries_log.png)
-
 ---
 
 # Time Series for State / Provinces
@@ -35,5 +33,3 @@ python states.py
 ```
 
 ![](fig/states_lin.png)
-
-![](fig/states_log.png)
