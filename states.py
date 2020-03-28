@@ -11,6 +11,8 @@ top_n_regions = 15
 y_scale = 1000
 data_to_plot = ['Confirmed', 'Deaths']
 country = 'US'
+dpi = 150
+figsize = (1200 / dpi, 675 / dpi)
 
 # Get dataframe for all data files
 df_all = data_grabber.get_covid_df()
@@ -48,7 +50,7 @@ df = pd.DataFrame(data_dict).T
 df.sort_values('{}_Total'.format(sort_var), axis=0, ascending=False, inplace=True)
 
 # Plot timeline data for each category
-fig, axs = plt.subplots(len(data_to_plot), 1, figsize=(11, 8.5), dpi=150, sharex=True)
+fig, axs = plt.subplots(len(data_to_plot), 1, figsize=figsize, dpi=150, sharex=True)
 months = mdates.MonthLocator()
 days = mdates.DayLocator()
 for y_str, ax in zip(data_to_plot, axs):
@@ -64,11 +66,11 @@ for y_str, ax in zip(data_to_plot, axs):
     ax.xaxis.set_major_locator(months)
     ax.xaxis.set_minor_locator(days)
     ax.grid()
-    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 now = datetime.utcnow()
 axs[0].set_title('Generated on {}'.format(now.strftime('%b %d %Y %H:%M:%S UTC')))
+axs[0].legend(loc=2, fontsize=8, ncol=int(np.ceil(top_n_regions / 8)))  # 8 rows max
 if y_scale == 1:
-    fig.savefig('fig/states_log.png')
+    fig.savefig('fig/states_log.png', bbox_inches='tight')
 else:
-    fig.savefig('fig/states_lin.png')
+    fig.savefig('fig/states_lin.png', bbox_inches='tight')
 fig.show()
