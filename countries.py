@@ -61,4 +61,9 @@ for y_str, ax in zip(data_to_plot, axs):
     ax.xaxis.set_minor_locator(days)
     ax.grid()
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+axs[0].set_title('Generated on {}'.format(np.datetime_as_string(date[-1], unit='D')))
+if y_scale == 1:
+    fig.savefig('fig/countries_log.png')
+else:
+    fig.savefig('fig/countries_lin.png')
 fig.show()
