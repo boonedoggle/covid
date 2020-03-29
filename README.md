@@ -22,7 +22,7 @@ Activate the conda environment before running any of the python scripts
 python countries.py
 ```
 
-![](fig/countries_lin.png)
+![](fig/countries.png)
 
 ---
 
@@ -32,4 +32,4 @@ python countries.py
 python states.py
 ```
 
-![](fig/states_lin.png)
+![](fig/states.png)

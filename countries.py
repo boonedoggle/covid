@@ -7,12 +7,12 @@ from datetime import datetime
 
 # Data location and variables
 sort_var = 'Confirmed'
-top_n_regions = 10
+top_n_regions = 5
 y_scale = 1000
 data_to_plot = ['Confirmed', 'Deaths']
 dpi = 150
 figsize = (1200 / dpi, 675 / dpi)
-date_start = np.datetime64('2020-02-01')  # Data starts at 2020-01-22
+date_start = np.datetime64('2020-02-20')  # Data starts at 2020-01-22
 date_final = np.datetime64('2020-04-01')  # None for max
 
 # Get dataframe for all data files
@@ -38,9 +38,9 @@ for c in df_all['Country_Region'].unique():
     c_dict['Deaths'] = np.array(Deaths)
     c_dict['Recovered'] = np.array(Recovered)
     # Calculate the total for each category to plot the top countries ones
-    c_dict['Confirmed_Total'] = np.array(Confirmed).sum()
-    c_dict['Deaths_Total'] = np.array(Deaths).sum()
-    c_dict['Recovered_Total'] = np.array(Recovered).sum()
+    c_dict['Confirmed_Total'] = np.array(Confirmed)[-1]
+    c_dict['Deaths_Total'] = np.array(Deaths)[-1]
+    c_dict['Recovered_Total'] = np.array(Recovered)[-1]
     data_dict[c] = c_dict
 
 # Convert dictionary of dictionaries into a dataframe
@@ -49,32 +49,31 @@ df = pd.DataFrame(data_dict).T
 df.sort_values('{}_Total'.format(sort_var), axis=0, ascending=False, inplace=True)
 
 # Plot timeline data for each category
-fig, axs = plt.subplots(len(data_to_plot), 1, figsize=figsize, dpi=150, sharex=True)
+plt.style.use('dark_background')
+fig, axs = plt.subplots(2, len(data_to_plot), figsize=figsize, dpi=dpi, sharex='all')
 months = mdates.MonthLocator()
 days = mdates.DayLocator()
-for y_str, ax in zip(data_to_plot, axs):
+for y_str, ax in zip(data_to_plot, axs.T):
+    ax0 = ax[0]
+    ax1 = ax[1]
     for ci, c in enumerate(df.iloc[0:top_n_regions].index.values):
         y = df.iloc[ci, :][y_str]
-        ax.plot_date(date, y / y_scale, '.-', label=c)
-    ax.xaxis.set_tick_params(labelsize=10)
-    if y_scale == 1:
-        ax.set_yscale('log')
-        ax.set_ylabel(y_str)
-    else:
-        ax.set_ylabel('{} [x{}]'.format(y_str, int(y_scale)))
+        ax0.plot_date(date, y / y_scale, '-', label=c)
+        dy = np.diff(y)
+        ax1.plot_date(date[1:], dy / y_scale, '-', label=c)
+    ax0.xaxis.set_tick_params(labelsize=10)
+    ax0.set_title('{} [x{}]'.format(y_str, int(y_scale)))
+    ax1.set_title('Daily Change {} [x{}]'.format(y_str, int(y_scale)))
     dst = date[0] if date_start is None else date_start
-    den = ax.get_xlim()[1] if date_final is None else date_final
-    ax.set_xlim((dst, den))
+    den = ax0.get_xlim()[1] if date_final is None else date_final
+    ax0.set_xlim((dst, den))
     formatter = mdates.ConciseDateFormatter('%b')
-    ax.xaxis.set_major_locator(months)
-    ax.xaxis.set_major_formatter(formatter)
-    ax.xaxis.set_minor_locator(days)
-    ax.grid()
+    ax0.xaxis.set_major_locator(months)
+    ax0.xaxis.set_major_formatter(formatter)
+    ax0.xaxis.set_minor_locator(days)
+    ax0.grid(alpha=0.2)
+    ax1.grid(alpha=0.2)
 now = datetime.utcnow()
-axs[0].set_title('Generated on {}'.format(now.strftime('%b %d %Y %H:%M:%S UTC')))
-axs[0].legend(loc=2, fontsize=8, ncol=int(np.ceil(top_n_regions / 8)))  # 8 rows max
-if y_scale == 1:
-    fig.savefig('fig/countries_log.png', bbox_inches='tight')
-else:
-    fig.savefig('fig/countries_lin.png', bbox_inches='tight')
+axs[1, 0].legend(loc=2, fontsize=8, ncol=int(np.ceil(top_n_regions / 8)))  # 8 rows max
+fig.savefig('fig/countries.png', bbox_inches='tight')
 fig.show()
