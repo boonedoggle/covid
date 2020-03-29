@@ -2,13 +2,7 @@ import os, tempfile, git, datetime
 import pandas as pd
 
 
-def get_data_folder(git_url=None, git_dir=None, data_sub_dir=None):
-    if git_url is None:
-        git_url = 'https://github.com/CSSEGISandData/COVID-19.git'
-    if git_dir is None: # Save to temporary location
-        git_dir = os.path.join(tempfile.gettempdir(), os.path.basename(git_url).split('.')[0])
-    if data_sub_dir is None:
-        data_sub_dir = 'csse_covid_19_data/csse_covid_19_daily_reports'
+def _get_data_folder(git_url, git_dir, data_sub_dir):
     if not os.path.isdir(git_dir):  # Clone repo if it does not exist
         print('Cloning Repository: {}'.format(git_url))
         git.Repo.clone_from(git_url, git_dir)
@@ -21,8 +15,13 @@ def get_data_folder(git_url=None, git_dir=None, data_sub_dir=None):
 
 def get_covid_df(git_url=None, git_dir=None, data_sub_dir=None):
     # Get data from repo and get list of the csv data files
-    data_folder = get_data_folder(git_url=git_url, git_dir=git_dir,
-                                  data_sub_dir=data_sub_dir)
+    if git_url is None:
+        git_url = 'https://github.com/CSSEGISandData/COVID-19.git'
+    if git_dir is None: # Save to temporary location
+        git_dir = os.path.join(tempfile.gettempdir(), os.path.basename(git_url).split('.')[0])
+    if data_sub_dir is None:
+        data_sub_dir = 'csse_covid_19_data/csse_covid_19_daily_reports'
+    data_folder = _get_data_folder(git_url, git_dir, data_sub_dir)
     data_file_names = [p for p in os.listdir(data_folder) if p.endswith('.csv')]
     
     # Combine each csv data file into a common dataframe
