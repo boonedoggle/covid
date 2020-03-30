@@ -33,3 +33,11 @@ python states.py
 ```
 
 ![](fig/states.png)
+
+# Time Series for Philadelphia
+
+```
+python philadelphia.py
+```
+
+![](fig/philadelphia.png)
