@@ -14,7 +14,7 @@ country = 'US'
 dpi = 150
 figsize = (1200 / dpi, 675 / dpi)
 date_start = np.datetime64('2020-03-01')  # None for min
-date_final = np.datetime64('2020-04-01')  # None for max
+date_final = None  # None for max
 
 # Get dataframe for all data files
 df_all = data_grabber.get_covid_df()
@@ -56,7 +56,7 @@ plt.style.use('dark_background')
 fig, axs = plt.subplots(2, len(data_to_plot), figsize=figsize, dpi=dpi, sharex='all')
 months = mdates.MonthLocator()
 days = mdates.DayLocator()
-for y_str, ax in zip(data_to_plot, axs.T):
+for yi, (y_str, ax) in enumerate(zip(data_to_plot, axs.T)):
     ax0 = ax[0]
     ax1 = ax[1]
     for ci, c in enumerate(df.iloc[0:top_n_regions].index.values):
@@ -64,6 +64,9 @@ for y_str, ax in zip(data_to_plot, axs.T):
         ax0.plot_date(date, y / y_scale, '-', label=c)
         dy = np.diff(y)
         ax1.plot_date(date[1:], dy / y_scale, '-', label=c)
+        if yi == 0 and ci == 0:
+            ax0.text(date[-1], 0.95 * y[-1] / y_scale, np.datetime_as_string(date[-1],
+                     'D'), horizontalalignment='right', color='y')
     ax0.xaxis.set_tick_params(labelsize=10)
     ax0.set_title('{} [x{}]'.format(y_str, int(y_scale)))
     ax1.set_title('Daily Change {} [x{}]'.format(y_str, int(y_scale)))
